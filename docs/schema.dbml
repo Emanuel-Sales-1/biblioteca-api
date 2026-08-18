@@ -1,0 +1,46 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table user {
+  id int [PK]
+  name varchar
+  email varchar [unique]
+}
+
+Table loan {
+  id int [PK]
+  copy_id int [ref: > "copy"."id"]
+  user_id int [ref: > "user"."id"]
+  loan_date date
+  due_date date
+  return_date date [null]
+}
+
+Table copy {
+  id int [PK]
+  identification_code int [unique]
+  book_id int [ref: > "book"."id"]
+}
+
+Table book {
+  id int [PK]
+  title varchar
+  publication_year year
+  publisher varchar
+}
+
+Table book_author {
+  author_id int [ref: <> "author"."id"]
+  book_id int [ref: <> "book"."id"]
+
+  indexes {
+    (author_id, book_id) [PK]
+  }
+}
+
+Table author {
+  id int [PK]
+  name varchar
+  birth_date date [null]
+  nationality varchar
+}
