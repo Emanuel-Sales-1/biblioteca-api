@@ -38,8 +38,10 @@ Library management system (books, authors, users, copies, loans).
 - [x] 1. DB modeling — see `docs/schema.dbml`
 - [x] 2. Project setup — repo, `.gitignore`, venv, `requirements.txt`, folder
       structure, first commit (`e4aa772`)
-- [ ] 3. DB connection + SQLAlchemy models — **in progress**, currently
-      setting up local PostgreSQL
+- [ ] 3. DB connection + SQLAlchemy models — **in progress**, Postgres
+      running via `docker-compose` (Docker installed, `docker-compose.yml`
+      + `.env`/`.env.example` added), now writing `app/database.py` and
+      the SQLAlchemy models
 - [ ] 4. CRUD for first entity end-to-end (create/read/update/delete +
       Pydantic validation)
 - [ ] 5. Relationships between entities
@@ -99,10 +101,16 @@ likely inside `database.py` or `models/book.py` (not yet implemented).
 All `app/*` files are currently empty placeholders — content is written
 phase by phase, by the user.
 
+## Infra
+
+Postgres runs locally via Docker Compose (`docker-compose.yml`, single `db`
+service, `postgres:16-alpine`, named volume for persistence). Credentials
+come from `.env` (gitignored; `.env.example` documents the required keys:
+`DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`).
+
 ## Current blocker / next step
 
-Setting up local PostgreSQL before phase 3 can start. Decided to use
-**Docker** (not installed yet on this machine) over a native `pacman`
-install, for isolation and because container experience is a relevant skill
-to demonstrate. Next concrete step: install Docker, then run a Postgres
-container, then start phase 3 (SQLAlchemy `database.py` + first model).
+No blocker. Postgres container is up (`docker compose up -d`, verified with
+`docker compose ps`). Next concrete step: write `app/database.py` (engine,
+session, `get_db` dependency) reading the connection settings from `.env`
+via `python-dotenv`, then the first SQLAlchemy model.
