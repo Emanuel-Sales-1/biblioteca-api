@@ -38,12 +38,12 @@ Library management system (books, authors, users, copies, loans).
 - [x] 1. DB modeling — see `docs/schema.dbml`
 - [x] 2. Project setup — repo, `.gitignore`, venv, `requirements.txt`, folder
       structure, first commit (`e4aa772`)
-- [ ] 3. DB connection + SQLAlchemy models — **in progress**, Postgres
-      running via `docker-compose` (Docker installed, `docker-compose.yml`
-      + `.env`/`.env.example` added), now writing `app/database.py` and
-      the SQLAlchemy models
+- [x] 3. DB connection + SQLAlchemy models — Postgres via `docker-compose`,
+      `app/database.py` (engine, `SessionLocal`, `get_db`, `Base`), and all
+      models written: `author`, `book` (+ `book_author` association table),
+      `copy`, `user`, `loan`
 - [ ] 4. CRUD for first entity end-to-end (create/read/update/delete +
-      Pydantic validation)
+      Pydantic validation) — **in progress**
 - [ ] 5. Relationships between entities
 - [ ] 6. Pagination and queries
 - [ ] 7. Tests with pytest
@@ -95,11 +95,12 @@ tests/
 
 `book_author` intentionally has **no** model/schema/router file of its own —
 it's a pure junction table (no own identity, no REST endpoints of its own).
-It should be defined as a plain SQLAlchemy `Table`, not a full model class,
-likely inside `database.py` or `models/book.py` (not yet implemented).
+Implemented as a plain SQLAlchemy Core `Table` inside `models/book.py`,
+alongside the `Book` model.
 
-All `app/*` files are currently empty placeholders — content is written
-phase by phase, by the user.
+All 5 entity models (`author`, `book`, `copy`, `user`, `loan`) plus
+`book_author` are implemented in `app/models/`. `app/schemas/`,
+`app/routers/`, and `app/main.py` are still empty placeholders.
 
 ## Infra
 
@@ -110,7 +111,20 @@ come from `.env` (gitignored; `.env.example` documents the required keys:
 
 ## Current blocker / next step
 
-No blocker. Postgres container is up (`docker compose up -d`, verified with
-`docker compose ps`). Next concrete step: write `app/database.py` (engine,
-session, `get_db` dependency) reading the connection settings from `.env`
-via `python-dotenv`, then the first SQLAlchemy model.
+No blocker. Phase 3 is done — all models exist and were verified to import
+and resolve their foreign keys correctly (tables not yet created in
+Postgres itself; that'll happen once CRUD needs it, likely via
+`Base.metadata.create_all(engine)` or Alembic migrations — not decided
+yet). Next concrete step: phase 4, full CRUD (create/read/update/delete +
+Pydantic validation) for one entity end-to-end, picking a first entity to
+start with.
+
+## Git workflow
+
+One branch per logical unit of work (e.g. `feature/author-model`, not one
+branch for the whole phase 3). Each branch gets a PR into `main` with a
+Summary/Test plan description, reviewed and merged before starting the
+next unit. `delete_branch_on_merge` is enabled on the GitHub repo, so
+remote branches clean up automatically after merge — still need
+`git branch -d <name>` locally. Commit messages follow Conventional
+Commits (`feat: ...`, `fix: ...`, `chore: ...`, `docs: ...`).
